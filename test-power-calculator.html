@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBC Power Calculator Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .calculator {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .results {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .result-card {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            border-left: 4px solid #2563eb;
+        }
+        .compliance {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .compliant { background: #dcfce7; color: #166534; }
+        .conditional { background: #fef3c7; color: #92400e; }
+        .non-compliant { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <h1>NBC Broadcasting Power Calculator</h1>
+    <p>Calculate effective radiated power and compliance for UHF, VHF, FM, and AM broadcasting</p>
+
+    <div class="calculator">
+        <div class="form-group">
+            <label for="service-type">Service Type</label>
+            <select id="service-type">
+                <option value="fm">FM Radio</option>
+                <option value="am">AM Radio</option>
+                <option value="vhf">VHF TV</option>
+                <option value="uhf">UHF TV</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="frequency">Frequency (MHz)</label>
+            <input type="number" id="frequency" placeholder="88-108">
+        </div>
+
+        <div class="form-group">
+            <label for="transmitter-power">Transmitter Power (W)</label>
+            <input type="number" id="transmitter-power" placeholder="1000">
+        </div>
+
+        <div class="form-group">
+            <label for="antenna-gain">Antenna Gain (dB)</label>
+            <input type="number" id="antenna-gain" placeholder="6">
+        </div>
+
+        <div class="form-group">
+            <label for="cable-loss">Cable Loss (dB)</label>
+            <input type="number" id="cable-loss" placeholder="2">
+        </div>
+
+        <div class="form-group">
+            <label for="antenna-height">Antenna Height (m)</label>
+            <input type="number" id="antenna-height" placeholder="30">
+        </div>
+
+        <button onclick="calculatePower()">Calculate Power</button>
+
+        <div id="results" class="results" style="display: none;">
+            <h3>Calculation Results</h3>
+            <div class="result-grid">
+                <div class="result-card">
+                    <h4>Effective Radiated Power</h4>
+                    <div id="erp" style="font-size: 24px; font-weight: bold; color: #2563eb;"></div>
+                </div>
+                <div class="result-card">
+                    <h4>Coverage Area</h4>
+                    <div id="coverage" style="font-size: 24px; font-weight: bold; color: #059669;"></div>
+                </div>
+                <div class="result-card">
+                    <h4>Field Strength (1km)</h4>
+                    <div id="field-strength" style="font-size: 24px; font-weight: bold; color: #7c3aed;"></div>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <h4>NBC Compliance Status</h4>
+                <div id="compliance" class="compliance"></div>
+                <div id="recommendations" style="margin-top: 10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculatePower() {
+            const serviceType = document.getElementById('service-type').value;
+            const frequency = parseFloat(document.getElementById('frequency').value);
+            const txPower = parseFloat(document.getElementById('transmitter-power').value);
+            const gain = parseFloat(document.getElementById('antenna-gain').value);
+            const loss = parseFloat(document.getElementById('cable-loss').value);
+            const height = parseFloat(document.getElementById('antenna-height').value);
+
+            if (!frequency || !txPower || !gain || !loss || !height) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Calculate Effective Radiated Power (ERP)
+            const erp = txPower + gain - loss;
+
+            // Calculate coverage area
+            let coverageArea = 0;
+            if (serviceType === 'fm') {
+                coverageArea = Math.pow(erp, 0.5) * 15;
+            } else if (serviceType === 'am') {
+                coverageArea = Math.pow(erp, 0.4) * 8;
+            } else if (serviceType === 'vhf') {
+                coverageArea = Math.pow(erp, 0.5) * 12;
+            } else if (serviceType === 'uhf') {
+                coverageArea = Math.pow(erp, 0.5) * 10;
+            }
+
+            // Calculate field strength
+            const fieldStrength = (erp * 100) / (4 * Math.PI * Math.pow(1000, 2));
+
+            // Determine compliance
+            let compliance = '';
+            let recommendations = [];
+
+            if (serviceType === 'fm') {
+                if (erp <= 1000) {
+                    compliance = 'Compliant';
+                    recommendations = ['Power level is within NBC limits', 'Suitable for local broadcasting'];
+                } else if (erp <= 5000) {
+                    compliance = 'Conditional';
+                    recommendations = ['Requires special authorization', 'Consider reducing power'];
+                } else {
+                    compliance = 'Non-Compliant';
+                    recommendations = ['Exceeds NBC power limits', 'Apply for special license'];
+                }
+            } else if (serviceType === 'am') {
+                if (erp <= 500) {
+                    compliance = 'Compliant';
+                    recommendations = ['Power level is within NBC limits', 'Suitable for local AM broadcasting'];
+                } else if (erp <= 2000) {
+                    compliance = 'Conditional';
+                    recommendations = ['Requires special authorization', 'Consider reducing power'];
+                } else {
+                    compliance = 'Non-Compliant';
+                    recommendations = ['Exceeds NBC power limits', 'Apply for special license'];
+                }
+            } else if (serviceType === 'vhf') {
+                if (erp <= 2000) {
+                    compliance = 'Compliant';
+                    recommendations = ['Power level is within NBC limits', 'Suitable for VHF TV broadcasting'];
+                } else if (erp <= 10000) {
+                    compliance = 'Conditional';
+                    recommendations = ['Requires special authorization', 'Consider reducing power'];
+                } else {
+                    compliance = 'Non-Compliant';
+                    recommendations = ['Exceeds NBC power limits', 'Apply for special license'];
+                }
+            } else if (serviceType === 'uhf') {
+                if (erp <= 5000) {
+                    compliance = 'Compliant';
+                    recommendations = ['Power level is within NBC limits', 'Suitable for UHF TV broadcasting'];
+                } else if (erp <= 20000) {
+                    compliance = 'Conditional';
+                    recommendations = ['Requires special authorization', 'Consider reducing power'];
+                } else {
+                    compliance = 'Non-Compliant';
+                    recommendations = ['Exceeds NBC power limits', 'Apply for special license'];
+                }
+            }
+
+            // Display results
+            document.getElementById('erp').textContent = erp.toFixed(1) + ' W';
+            document.getElementById('coverage').textContent = coverageArea.toFixed(1) + ' km²';
+            document.getElementById('field-strength').textContent = fieldStrength.toFixed(2) + ' mV/m';
+            
+            const complianceEl = document.getElementById('compliance');
+            complianceEl.textContent = compliance;
+            complianceEl.className = 'compliance ' + compliance.toLowerCase().replace(' ', '-');
+
+            const recommendationsEl = document.getElementById('recommendations');
+            recommendationsEl.innerHTML = '<strong>Recommendations:</strong><br>' + 
+                recommendations.map(rec => '• ' + rec).join('<br>');
+
+            document.getElementById('results').style.display = 'block';
+        }
+
+        // Set default values for testing
+        document.getElementById('frequency').value = '100';
+        document.getElementById('transmitter-power').value = '1000';
+        document.getElementById('antenna-gain').value = '6';
+        document.getElementById('cable-loss').value = '2';
+        document.getElementById('antenna-height').value = '30';
+    </script>
+</body>
+</html> 

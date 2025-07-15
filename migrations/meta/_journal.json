@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1750933663330,
+      "tag": "0000_lying_kabuki",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1750941821518,
+      "tag": "0001_nice_sleepwalker",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1750944847170,
+      "tag": "0002_great_blazing_skull",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1750950102861,
+      "tag": "0003_remarkable_miss_america",
+      "breakpoints": true
+    }
+  ]
+}

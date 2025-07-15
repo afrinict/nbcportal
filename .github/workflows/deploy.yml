@@ -1,0 +1,101 @@
+name: Deploy NBC Portal
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Create .env file
+      run: |
+        cat > .env << EOF
+        # Database Configuration
+        DATABASE_URL=${{ secrets.DATABASE_URL }}
+        
+        # JWT Configuration
+        JWT_SECRET=${{ secrets.JWT_SECRET }}
+        
+        # Environment
+        NODE_ENV=production
+        
+        # Server Configuration
+        PORT=${{ secrets.PORT || '5000' }}
+        
+        # Optional: Database Pool Configuration
+        DB_POOL_MIN=${{ secrets.DB_POOL_MIN || '2' }}
+        DB_POOL_MAX=${{ secrets.DB_POOL_MAX || '10' }}
+        
+        # Optional: CORS Configuration
+        CORS_ORIGIN=${{ secrets.CORS_ORIGIN || 'https://your-domain.com' }}
+        
+        # Optional: File Upload Configuration
+        MAX_FILE_SIZE=${{ secrets.MAX_FILE_SIZE || '10485760' }}
+        UPLOAD_PATH=${{ secrets.UPLOAD_PATH || './uploads' }}
+        
+        # Optional: Email Configuration
+        SMTP_HOST=${{ secrets.SMTP_HOST }}
+        SMTP_PORT=${{ secrets.SMTP_PORT }}
+        SMTP_USER=${{ secrets.SMTP_USER }}
+        SMTP_PASS=${{ secrets.SMTP_PASS }}
+        
+        # Optional: Redis Configuration
+        REDIS_URL=${{ secrets.REDIS_URL }}
+        
+        # Optional: Logging
+        LOG_LEVEL=${{ secrets.LOG_LEVEL || 'info' }}
+        EOF
+    
+    - name: Run tests
+      run: npm test
+      
+    - name: Build application
+      run: npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Create .env file for deployment
+      run: |
+        cat > .env << EOF
+        DATABASE_URL=${{ secrets.DATABASE_URL }}
+        JWT_SECRET=${{ secrets.JWT_SECRET }}
+        NODE_ENV=production
+        PORT=${{ secrets.PORT || '5000' }}
+        CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+        EOF
+    
+    - name: Deploy to production
+      run: |
+        # Add your deployment commands here
+        echo "Deploying to production..."
+        # Example: npm run deploy 
