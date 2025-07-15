@@ -12,15 +12,23 @@ export async function registerUser(userData: any) {
 }
 
 export async function getCurrentUser(token: string) {
-  const response = await fetch(buildApiUrl('/api/auth/me'), {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to get current user');
+  const response = await apiRequest('GET', '/api/auth/me');
+  return response.json();
+}
+
+export async function checkAuthStatus() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return null;
   }
   
-  return response.json();
+  try {
+    const response = await apiRequest('GET', '/api/auth/me');
+    return response.json();
+  } catch (error) {
+    // Token is invalid, remove it
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return null;
+  }
 }
