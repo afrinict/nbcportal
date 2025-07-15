@@ -31,14 +31,15 @@ const navigation = [
 
 const adminNavigation = [
   { name: 'Admin Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'Reports & Analytics', href: '/reports', icon: BarChart3 },
-  { name: 'Department Dashboard', href: '/admin/department-dashboard', icon: Building2 },
-  { name: 'Department Roles', href: '/admin/department-roles', icon: Shield },
+  { name: 'Department Dashboards', href: '/admin/dashboards', icon: BarChart3 },
   { name: 'Departments', href: '/admin/departments', icon: Building2 },
+  { name: 'Modules', href: '/admin/modules', icon: Workflow },
+  { name: 'User Management', href: '/admin/users', icon: Users },
+  { name: 'Reports & Analytics', href: '/reports', icon: BarChart3 },
+  { name: 'Department Roles', href: '/admin/department-roles', icon: Shield },
   { name: 'Units', href: '/admin/units', icon: Layers },
   { name: 'Subunits', href: '/admin/subunits', icon: ListTree },
-  { name: 'Workflow Builder', href: '/admin/workflow-builder', icon: Workflow },
-  { name: 'User Management', href: '/admin/users', icon: Users }
+  { name: 'Workflow Builder', href: '/admin/workflow-builder', icon: Workflow }
 ];
 
 export function Sidebar() {
