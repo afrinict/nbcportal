@@ -130,6 +130,16 @@ function requireRole(roles: string[]) {
 }
 
 export async function registerRoutes(app: express.Express): Promise<express.Server> {
+  // Health check endpoint
+  app.get("/api/health", (req, res) => {
+    res.status(200).json({ 
+      status: "healthy", 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  });
+
   // Auth routes
   app.post("/api/auth/register", async (req, res) => {
     try {
