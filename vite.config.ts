@@ -28,7 +28,7 @@ export default defineConfig({
   },
   root: resolve(__dirname, "client"),
   build: {
-    outDir: "dist/public",
+    outDir: "../dist/public",
     rollupOptions: {
       output: {
         manualChunks: {
